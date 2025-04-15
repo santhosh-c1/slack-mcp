@@ -30,7 +30,7 @@ Development mode:
 yarn dev
 ```
 
-To inspect the MCP server:
+In another terminal, inspect the MCP server:
 ```bash
 npx fastmcp inspect src/index.ts
 ```
