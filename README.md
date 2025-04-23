@@ -25,14 +25,14 @@ yarn install
 
 ## Running the Server
 
-Development mode:
+Run server:
 ```bash
-yarn dev
+yarn start
 ```
 
 In another terminal, inspect the MCP server:
 ```bash
-npx fastmcp inspect src/index.ts
+yarn inspect
 ```
 
 ## API
