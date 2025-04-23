@@ -56,6 +56,49 @@ server.addTool({
     },
 });
 
+// Set up event handlers
+server.on('disconnect', () => {
+    console.log(`Client disconnected`);
+});
+
+server.on('connect', () => {
+    console.log(`Client connected`);
+});
+
+// Handle process termination signals for graceful shutdown
+const shutdown = () => {
+    console.log('Shutting down gracefully...');
+    process.exit(0);
+};
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+process.on('uncaughtException', (error) => {
+    // Log but don't crash on unhandled errors
+    console.error('Uncaught exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    // Check if the error is related to the "Not connected" ping issue
+    const errorString = String(reason);
+    if (errorString.includes('Not connected') && errorString.includes('ping')) {
+        // Silently ignore ping failures as they're expected in some situations
+        return;
+    }
+
+    // Handle MCP connection closure errors
+    if (errorString.includes('Connection closed') &&
+        errorString.includes('MCP error -32000')) {
+        // These are expected when clients disconnect, so we'll just log at debug level
+        console.debug('Client disconnected (MCP connection closed)');
+        return;
+    }
+
+    // Log other unhandled rejections
+    console.error('Unhandled rejection:', reason);
+});
+
+// Start the server
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 console.log('Starting MCP server on port', port);
 server.start({
